@@ -24,7 +24,7 @@ from src.contract import Pool
 from src.route import Route
 
 
-DELAY_BETWEEN_SENDS = 1
+DELAY_BETWEEN_SENDS = 0.5
 DESIRED_HEIGHT = 0
 SYNC = True
 READ_TIMEOUT = 10
@@ -251,7 +251,76 @@ class Bot:
                                 desired_height=DESIRED_HEIGHT,
                                 sync=SYNC,
                                 timeout=READ_TIMEOUT)
-            logging.info(response.json())
+            
+            # put response into variables for use in telegram and logging
+            term_Out = response.json()
+            
+            code = term_Out['result']['code']
+            txs = term_Out['result']['txs']
+            auction_fee = term_Out['result']['auction_fee']
+            bundle_size = term_Out['result']['bundle_size']
+            desired_height = term_Out['result']['desired_height']
+            waited_for_sim_results = term_Out['result']['waited_for_simulation_results']
+            sim_success = term_Out['result']['simulation_success']
+            result_chk_txs = term_Out['result']['result_check_txs']
+            result_del_txs = term_Out['result']['result_deliver_txs']
+            error = term_Out['result']['error']
+
+            logging.info("----- Checking Possible Arbitrage  -----")
+            logging.info(f"Code: {code} Transaction: {txs}")
+            logging.info(f"Auction Fee: {auction_fee} Bundle Size: {bundle_size}")
+            logging.info(f"Desired Height: {desired_height}")
+            logging.info(f"Waited for results: {waited_for_sim_results}")
+            logging.info(f"Simulation Success: {sim_success}")
+            if result_chk_txs is not None:
+                for check_txs in result_chk_txs:
+                    # print(check_txs.keys())
+                    ctx_code = check_txs['code']
+                    ctx_data = check_txs['data']
+                    ctx_log = check_txs['log']
+                    ctx_info = check_txs['info']
+                    ctx_gas_wanted = check_txs['gas_wanted']
+                    ctx_gas_used = check_txs['gas_used']
+                    ctx_events = check_txs['events']
+                    ctx_codespace = check_txs['codespace']
+
+                    logging.info("-----  Checking the Transactions   -----")
+                    # logging.info(f"Checked TXs: {check_txs}")
+                    logging.info(f"Code: {ctx_code}")
+                    logging.info(f"Data: {ctx_data}")
+                    logging.info(f"Log: {ctx_log}")  
+                    logging.info(f"Info: {ctx_info}") 
+                    logging.info(f"Gas Wanted: {ctx_gas_wanted} Gas Used: {ctx_gas_used}")
+                    logging.info(f"Events: {ctx_events}")
+                    logging.info(f"Codespace: {ctx_codespace}") 
+ 
+            else:
+                None    
+            if result_del_txs is not None:          
+                for del_txs in result_del_txs:
+                    # print(del_txs.keys())
+                    logging.info("----- Firing Tx(s) to the Chain!!! -----")
+                    # logging.info(f"Delivered TXs: {del_txs}")
+                    dtx_code = del_txs['code']
+                    dtx_data = del_txs['data']
+                    dtx_log = del_txs['log']
+                    dtx_info = del_txs['info']
+                    dtx_gas_wanted = del_txs['gas_wanted']
+                    dtx_gas_used = del_txs['gas_used']
+                    dtx_events = del_txs['events']
+                    dtx_codespace = del_txs['codespace']
+
+                    logging.info(f"Code: {dtx_code}")
+                    logging.info(f"Data: {dtx_data}")
+                    logging.info(f"Log: {dtx_log}")  
+                    logging.info(f"Info: {dtx_info}") 
+                    logging.info(f"Gas Wanted: {dtx_gas_wanted} Gas Used: {dtx_gas_used}")
+                    logging.info(f"Events: {dtx_events}")
+                    logging.info(f"Codespace: {dtx_codespace}") 
+            else:
+                None 
+            logging.info(f"Process Error(s): {error}")
+            # logging.info(response.json())
             #logging.info(f"Route and reserves: {route_obj.__dict__}")
         except httpx.ReadTimeout:
             logging.error("Read timeout while waiting for response from Skip")
@@ -294,7 +363,75 @@ class Bot:
                                 desired_height=DESIRED_HEIGHT,
                                 sync=SYNC
                                 )
-            logging.info(response.json())
+            
+            retry_Out = response.json()
+            
+            rt_code = retry_Out['result']['code']
+            rt_txs = retry_Out['result']['txs']
+            rt_auction_fee = retry_Out['result']['auction_fee']
+            rt_bundle_size = retry_Out['result']['bundle_size']
+            rt_desired_height = retry_Out['result']['desired_height']
+            rt_waited_for_sim_results = retry_Out['result']['waited_for_simulation_results']
+            rt_sim_success = retry_Out['result']['simulation_success']
+            rt_result_chk_txs = retry_Out['result']['result_check_txs']
+            rt_result_del_txs = retry_Out['result']['result_deliver_txs']
+            rt_error = retry_Out['result']['error']
+            logging.info("-----        Retrying Bundle       -----")
+            logging.info("----- Checking Possible Arbitrage  -----")
+            logging.info(f"Code: {rt_code} Transaction: {rt_txs}")
+            logging.info(f"Auction Fee: {rt_auction_fee} Bundle Size: {rt_bundle_size}") 
+            logging.info(f"Desired Height: {rt_desired_height}")
+            logging.info(f"Waited for results: {rt_waited_for_sim_results}")
+            logging.info(f"Simulation Success: {rt_sim_success}")
+
+            if rt_result_chk_txs is not None:
+                for check_txs in rt_result_chk_txs:
+                    # print(check_txs.keys())
+                    ctx_code = check_txs['code']
+                    ctx_data = check_txs['data']
+                    ctx_log = check_txs['log']
+                    ctx_info = check_txs['info']
+                    ctx_gas_wanted = check_txs['gas_wanted']
+                    ctx_gas_used = check_txs['gas_used']
+                    ctx_events = check_txs['events']
+                    ctx_codespace = check_txs['codespace']
+                    logging.info("-----  Checking the Transactions   -----")
+                    # logging.info(f"Checked TXs: {check_txs}")
+                    logging.info(f"Code: {ctx_code}")
+                    logging.info(f"Data: {ctx_data}")
+                    logging.info(f"Log: {ctx_log}")  
+                    logging.info(f"Info: {ctx_info}") 
+                    logging.info(f"Gas Wanted: {ctx_gas_wanted} Gas Used: {ctx_gas_used}")
+                    logging.info(f"Events: {ctx_events}")
+                    logging.info(f"Codespace: {ctx_codespace}") 
+ 
+            else:
+                None    
+            if rt_result_del_txs is not None:          
+                for del_txs in rt_result_del_txs:
+                    # print(del_txs.keys())
+                    logging.info("----- Firing Retry Tx(s) to the chain!!! -----")
+                    # logging.info(f"Delivered TXs: {del_txs}")
+                    dtx_code = del_txs['code']
+                    dtx_data = del_txs['data']
+                    dtx_log = del_txs['log']
+                    dtx_info = del_txs['info']
+                    dtx_gas_wanted = del_txs['gas_wanted']
+                    dtx_gas_used = del_txs['gas_used']
+                    dtx_events = del_txs['events']
+                    dtx_codespace = del_txs['codespace']
+
+                    logging.info(f"Code: {dtx_code}")
+                    logging.info(f"Data: {dtx_data}")
+                    logging.info(f"Log: {dtx_log}")  
+                    logging.info(f"Info: {dtx_info}") 
+                    logging.info(f"Gas Wanted: {dtx_gas_wanted} Gas Used: {dtx_gas_used}")
+                    logging.info(f"Events: {dtx_events}")
+                    logging.info(f"Codespace: {dtx_codespace}") 
+            else:
+                None 
+            logging.info(f"Process Error(s): {rt_error}")
+            # logging.info(response.json())
         except httpx.ReadTimeout:
             logging.error("Read timeout while waiting for response from Skip")
             return False
